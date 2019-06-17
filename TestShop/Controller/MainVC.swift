@@ -8,13 +8,14 @@
 
 import UIKit
 import Firebase
+import FirebaseAuth
 
-//enum ProductCategory : String {
-//    case all : "All"
-//    case ipad : "iPad"
-//    case mac : "Mac"
-//    case iphone : "iPhone"
-//}
+enum ProductCategory : String {
+    case all = "all"
+    case ipad = "ipad"
+    case mac = "mac"
+    case iphone = "iphone"
+}
 
 class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
@@ -29,7 +30,9 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     private var databaseTest = [DatabaseTest]()
     private var databaseCollectionRef : CollectionReference!
     private var productListener : ListenerRegistration!
-//    private var selectedCategory = ProductCategory.all.rawValue
+    private var handle: AuthStateDidChangeListenerHandle?
+    private var selectedCategory = ProductCategory.all.rawValue
+    
     
     
     override func viewDidLoad() {
@@ -44,33 +47,58 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         databaseCollectionRef = Firestore.firestore().collection(TEXT_REF)
         
     }
-    @IBAction func categoryChanged(_ sender: Any) {
-        
-//        switch segmentController.selectedSegmentIndex {
-//        case 0:
-//            selectedCategory = ProductCategory.iphone.rawValue
-//        case 1:
-//            selectedCategory = ProductCategory.ipad.rawValue
-//        case 2:
-//            selectedCategory = ProductCategory.mac.rawValue
-//            
-//        default:
-//            selectedCategory = ProductCategory.all.rawValue
-//        }
-//        productListener.remove()
-//        setListener()
-//        
-    }
     
     override func viewWillAppear(_ animated: Bool) {
+        handle = Auth.auth().addStateDidChangeListener({ (auth, user) in
+            if user == nil {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let loginVC = storyboard.instantiateViewController(withIdentifier: "loginVC")
+                self.present(loginVC, animated: true, completion: nil)
+                
+            } else {
+                self.setListener()
+            }
+        })
         
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        if productListener != nil {
+            productListener.remove()
+        }
+        
+    }
+    
+    
+    @IBAction func categoryChanged(_ sender: Any) {
+        
+        switch segmentController.selectedSegmentIndex {
+        case 0:
+            selectedCategory = ProductCategory.iphone.rawValue
+        case 1:
+            selectedCategory = ProductCategory.ipad.rawValue
+        default:
+            selectedCategory = ProductCategory.mac.rawValue
+        }
+        productListener.remove()
         setListener()
         
     }
     
+    @IBAction func logoutTapped(_ sender: Any) {
+        let firebaseAuth = Auth.auth()
+        do {
+            try firebaseAuth.signOut()
+        } catch let signoutError as NSError {
+            debugPrint("Error signing out:\(signoutError)")
+        }
+        
+    }
+    
+    
     func setListener() {
         
-       productListener =  databaseCollectionRef.addSnapshotListener { (snapshot, error) in
+       productListener =  databaseCollectionRef.whereField(CATEGORY, isEqualTo: selectedCategory).addSnapshotListener { (snapshot, error) in
             if let err = error {
                 debugPrint("Error fetching data \(err)")
             } else {
@@ -93,9 +121,7 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        productListener.remove()
-    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return databaseTest.count
