@@ -24,14 +24,14 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     //Outlets
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet weak var segmentController: UISegmentedControl!
-    
+        
     
     //Variables
     private var databaseTest = [DatabaseTest]()
     private var databaseCollectionRef : CollectionReference!
     private var productListener : ListenerRegistration!
     private var handle: AuthStateDidChangeListenerHandle?
-    private var selectedCategory = ProductCategory.all.rawValue
+    private var selectedCategory = ProductCategory.iphone.rawValue
     
     
     
@@ -72,6 +72,8 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBAction func categoryChanged(_ sender: Any) {
         
+        
+        
         switch segmentController.selectedSegmentIndex {
         case 0:
             selectedCategory = ProductCategory.iphone.rawValue
@@ -94,6 +96,7 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         }
         
     }
+    
     
     
     func setListener() {
@@ -136,6 +139,10 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
             return UITableViewCell()
         }
     }
+    
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        guard let ProductInfoVC = segue.destination as? ProductInfoVC else { return }
+//    }
 
 
 }
