@@ -11,7 +11,7 @@ import Firebase
 import FirebaseAuth
 
 enum ProductCategory : String {
-    case all = "all"
+    //case all = "all"
     case ipad = "ipad"
     case mac = "mac"
     case iphone = "iphone"
@@ -140,9 +140,19 @@ class MainVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         }
     }
     
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        guard let ProductInfoVC = segue.destination as? ProductInfoVC else { return }
-//    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "toInfo", sender: databaseTest[indexPath.row])
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toInfo" {
+            if let destinationVC = segue.destination as? ProductInfoVC {
+                if let productDatabase = sender as? DatabaseTest {
+                    destinationVC.productDatabase = productDatabase
+                }
+            }
+        }
+    }
 
 
 }

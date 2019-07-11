@@ -11,17 +11,24 @@ import Firebase
 
 class ProductInfoVC: UIViewController {
     
-    //Outlets
-
-    @IBOutlet weak var productDescriptionTxt: UILabel!
-    @IBOutlet weak var technicalSpecTxt: UILabel!
+    //Variables
+    
+    
+    var productDatabase : DatabaseTest!
+    var databaseTest = [DatabaseTest]()
+    var databaseRef : CollectionReference!
+    let firestore = Firestore.firestore()
     
     
     
-    
+    //Outlets    @IBOutlet weak var technicalSpecTxt: UILabel!
+    @IBOutlet weak var productDescriptionInfo: UILabel!
+    @IBOutlet weak var technicalInfo: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+//        databaseRef = firestore.collection(TEXT_REF).document(productDatabase.documentId)
 
         
     }
